@@ -25,5 +25,4 @@ In findings my way around shinyswipr's inner workings I've realised that the fol
 - updated approach to writing modules server functions in shiny, see Ch. 19 in https://mastering-shiny.org/
 - communicating from JavaSript back to Shiny: using Shiny.setInputValue instead of Shiny.onInputChange https://shiny.rstudio.com/articles/communicating-with-js.html
 
-However, after fiddling a bit with these updates - without much success - I've decided to stick with the "old" approach to calling a module's server; similarly I didn't
-
+However, after fiddling a bit with these updates - without much success - I've decided to stick with the "old" approach: after all, the main motivation was to get the bloody think to recognise a swipe on a hybrid device. But conscious there is room for a neater code if the latest best practice is taken into account.
