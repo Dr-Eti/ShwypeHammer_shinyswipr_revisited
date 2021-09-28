@@ -17,11 +17,11 @@ On the surface, the modified app
 
 Under the hood I changed the inner workings of shinyswipr as follows
 - Self contained app, reading .js and .css from its own \www subfolder instead of relying on the shinywsipr package location
-- Hammer.js replace touchSwipe.js as a touch detection device
+- Hammer.js replaces touchSwipe.js as a touch detection device
 - own .js and .css files governing a different card swipe animation based on hammer.js (replace shinySwiper.js and swiprStyle.css) 
 
 ## Caveat
-In findings my way around shinyswipr's inner workings I've realised that the following major updates have occurred
+In wrapping my head around shinyswipr's inner workings I've realised that the following major updates have occurred
 - updated approach to writing modules server functions in shiny, see Ch. 19 in https://mastering-shiny.org/
 - communicating from JavaSript back to Shiny: using Shiny.setInputValue instead of Shiny.onInputChange https://shiny.rstudio.com/articles/communicating-with-js.html
 
