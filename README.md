@@ -28,9 +28,9 @@ In wrapping my head around shinyswipr's inner workings I've realised that the fo
 However, after fiddling a bit with these updates - without much success - I've decided to stick with the "old" approach: after all, the main motivation was to get the bloody think to recognise a swipe on a hybrid device. But conscious there is room for a neater code if the latest best practice is taken into account.
 
 ## What does it do?
-Below I show few screenshots taken from running the app locally. The web browser (Firefox) is in web devloper mode to show the custom logs.
+Below I show few screenshots taken from running the app locally. The web browser (Firefox) is in web developer mode to show the custom logs.
 
-First, we start with the app in 'rest' state. The user is presented with a card containing a random quote from the fortunes R package, and a random image taken from the web. the logs displays a succesful connection from R Shiny to the custom JavaScript via a dedicated module server
+First, we start with the app in 'rest' state. The user is presented with a card containing a random quote from the fortunes R package, and a random image taken from the web. the logs displays a successful connection from R Shiny to the custom JavaScript via a dedicated module server
 
 ![image](https://user-images.githubusercontent.com/55926257/135081817-57f2ad00-88ed-4ffa-b901-11be545b77e4.png)
 
@@ -46,7 +46,7 @@ Now let's assume the user swipes right with sufficient intent. The top card has 
 
 ![image](https://user-images.githubusercontent.com/55926257/135082557-5aa8d0c4-a260-40ff-8093-c045e565b7ff.png)
 
-A look a the "siwpe log" tab shows that we now have a row recording the quote and swipe direction associated with the card the user has just swiped.
+A look a the "swipe log" tab shows that we now have a row recording the quote and swipe direction associated with the card the user has just swiped.
 
 ![image](https://user-images.githubusercontent.com/55926257/135082924-734f941f-eedb-4911-b535-0d1bbe521172.png)
 
