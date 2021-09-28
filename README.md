@@ -11,7 +11,7 @@ Specifically, I've realised that shinyswipr relies on TocuhSwipe.js for gesture 
 I didn't rewrite the package - I'm not that clever. But I propose here a modified version of the "quote swipr" example described in https://livefreeordichotomize.com/2017/03/12/introducing-shinyswipr-swipe-your-way-to-a-great-shiny-ui/
 
 
-On the surface, the modified app
+On the surface, the modified app:
 - Displays a pair of randomly generated quotes and images on a card deck 
 - Uses a "multi page" layout so that the swipe log is displayed on a separate tab rather than under the card deck
 
