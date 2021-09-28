@@ -25,7 +25,7 @@ In wrapping my head around shinyswipr's inner workings I've become aware of the 
 - A change in the approach to writing and calling modules in shiny, see Ch. 19 in https://mastering-shiny.org/
 - A recommendation to use Shiny.setInputValue instead of Shiny.onInputChange when communicating from JavaSript back to Shiny, see https://shiny.rstudio.com/articles/communicating-with-js.html
 
-However, after fiddling a bit with these updates - without much success - I've decided to stick with the "old" approach: after all, the main motivation was to get the bloody think to recognise a swipe on a hybrid device. But conscious there is room for a neater code if the latest best practice is taken into account.
+However, after fiddling a bit with these updates - without much success - I've decided to stick with the "old" approach: after all, the main motivation was to get the bloody thing to recognise a swipe on a hybrid device - wasn't it? But conscious there is room for a neater code if the latest best practice is taken into account.
 
 ## What does it do?
 Below I show few screenshots taken from running the app locally. The web browser (Firefox) is in web developer mode to show the custom logs.
