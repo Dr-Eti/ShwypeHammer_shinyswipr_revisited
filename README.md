@@ -1,7 +1,7 @@
 # ShwypeHammer: shinyswipr revisited
 
 ## Motivation
-shinyswipr is an R package that enables users to build a 'swipe-able' card-deck interface in Shiny  (https://github.com/nstrayer/shinyswipr)
+shinyswipr is an R package that enables users to build a 'swipe-able' card-deck interface in Shiny (developed by @nnstrayer; https://github.com/nstrayer/shinyswipr)
 Yet I've soon noticed that a Shiny app built using the original shinyswipr package won't work on devices that enable both touch and mouse input simultaneously (e.g. touchscreen laptop)
 If you have that kind of device you can try by yourself by having a go at the demo provided by the author at https://nickstrayer.shinyapps.io/shinysense_swipr_demo/
 
