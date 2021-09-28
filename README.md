@@ -21,9 +21,9 @@ Under the hood I changed the inner workings of shinyswipr as follows
 - own .js and .css files governing a different card swipe animation based on hammer.js (replace shinySwiper.js and swiprStyle.css) 
 
 ## Caveat
-In wrapping my head around shinyswipr's inner workings I've realised that the following major updates have occurred since the package was first released:
-- updated approach to writing modules server functions in shiny, see Ch. 19 in https://mastering-shiny.org/
-- communicating from JavaSript back to Shiny: using Shiny.setInputValue instead of Shiny.onInputChange https://shiny.rstudio.com/articles/communicating-with-js.html
+In wrapping my head around shinyswipr's inner workings I've become aware of the following changes in 'best practices' since the package was first released:
+- A change in the approach to writing and calling modules in shiny, see Ch. 19 in https://mastering-shiny.org/
+- A recommendation to use Shiny.setInputValue instead of Shiny.onInputChange when communicating from JavaSript back to Shiny, see https://shiny.rstudio.com/articles/communicating-with-js.html
 
 However, after fiddling a bit with these updates - without much success - I've decided to stick with the "old" approach: after all, the main motivation was to get the bloody think to recognise a swipe on a hybrid device. But conscious there is room for a neater code if the latest best practice is taken into account.
 
