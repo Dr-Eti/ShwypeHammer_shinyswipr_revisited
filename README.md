@@ -50,3 +50,16 @@ A look a the "swipe log" tab shows that we now have a row recording the quote an
 
 ![image](https://user-images.githubusercontent.com/55926257/135082924-734f941f-eedb-4911-b535-0d1bbe521172.png)
 
+## Code info
+
+- `app.R` launches shiny app and manages the UI 
+- `Module_swipeCard_UI` designs the card UI
+- `appVals` variable stores internal values: has `quote`, `random_image`, swipes`
+- `output` is the actual rendered values: `quote` , `url` `resultsTable`
+
+## TODO
+:white_check_mark: Create a Todo list <br> 
+:black_square_button: Read images & pairing data from a csv <br> 
+:black_square_button: Save swipe data into Google sheet <br> 
+:black_square_button: Need a way to finish swiping all <br> 
+:black_square_button: Connect Google sheet to back-end processing <br> 
