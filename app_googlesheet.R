@@ -26,6 +26,7 @@
 #### Part 0: Load packages ####
 library(shiny)
 library(fortunes) 
+library("googlesheets4")
 
 #### Part 1: Module UI for swipe card deck ####
 Module_swipeCard_UI <- function(id, pass_img, pass_h3, pass_p){
@@ -110,6 +111,9 @@ server <- function(input, output, session){
   # for an update see see Ch. 19 in https://mastering-shiny.org/
   card_swipe <- callModule(Module_swipeCard_serverOLD, "my_tinderLike_swiper")
   
+  # url for update google-sheet
+  url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"
+  
   # The below follows pretty much the original quote sweeper example
   # except I don't track the author of a quote, and introduce random images
   appVals <- reactiveValues(
@@ -127,11 +131,14 @@ server <- function(input, output, session){
   
   observeEvent( card_swipe(),{
     #Record last swipe results.
+    new_swipe_result = data.frame(quote = appVals$quote$quote, swipe = card_swipe())
     appVals$swipes <- rbind(
-      data.frame(quote = appVals$quote$quote,
-                 swipe = card_swipe()
-      ), appVals$swipes
+      new_swipe_result, appVals$swipes
     )
+    
+    #save data into Google sheet
+    sheet_append(url_sheet, data = new_swipe_result, sheet = 1)
+    
     #send results to the output.
     output$resultsTable <- renderTable({appVals$swipes})
     
