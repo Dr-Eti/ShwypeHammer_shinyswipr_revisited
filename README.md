@@ -54,8 +54,8 @@ A look a the "swipe log" tab shows that we now have a row recording the quote an
 
 - `app.R` launches shiny app and manages the UI 
 - `Module_swipeCard_UI` designs the card UI
-- `appVals` variable stores internal values: has `quote`, `random_image`, swipes`
-- `output` is the actual rendered values: `quote` , `url` `resultsTable`
+- `appVals` variable stores internal values: has `quote`, `random_image`, `swipes`
+- `output` is the actual rendered values: `quote` , `url`, `resultsTable`
 
 ## TODO
 :white_check_mark: Create a Todo list <br> 
