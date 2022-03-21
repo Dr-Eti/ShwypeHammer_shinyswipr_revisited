@@ -128,7 +128,10 @@ ui <- fluidPage(
     ),
     tabPanel("Swipes log",
              tableOutput("resultsTable")
-    )
+    ),
+    tabPanel("TEST coutner",                                         # DEBUG ONLY: remove
+             tableOutput("n_swipes")
+    ),
   )
 )
 
@@ -140,6 +143,7 @@ server <- function(input, output, session){
   ## Write swipes on google sheet
   url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"          # Xiang's
   #url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0"           # Ettore's
+  
   
   ## TO DO: fix writing rights to access url for update google-sheet
   
@@ -168,11 +172,26 @@ server <- function(input, output, session){
   ## Add arc ID column
   cards_content <- cbind(1:nrow(edges),edges)
   colnames(cards_content) <- c("arc_id",colnames(edges))
+  
+  
+  
+  ## For debug: read just few entries
+  # cards_content <- cards_content[1:4,]
+  
+  
+  
   ## count the total n. of edges  
   n_edges_all <- nrow(cards_content)
   cards_ID_list <- as.vector(cards_content[,1])
   ## initiate sequential edge counter (card pair) 
   current_card_ID <- 1
+  
+  ## Internal counter (reactive): thread https://stackoverflow.com/questions/33671915/r-shiny-server-how-to-keep-variable-value-in-observeevent-function
+  v <- reactiveValues(counter = 1L)
+  output$n_swipes <- renderPrint({
+    print(v$counter)
+  }) 
+  
   current_card_content <- cards_content[current_card_ID,]         # select current card contents
   our_arc_ID <- as.character(current_card_content$arc_id)
   our_quote_1 <- as.character(current_card_content$Source_label)
@@ -200,7 +219,7 @@ server <- function(input, output, session){
   ## TO DO: find a way to terminate the event listener below and change/shut down the UI when all edges (pairs) have been rated
   
   observeEvent( card_swipe(), {
-    if (current_card_ID <= n_edges_all){
+    if (current_card_ID <= n_edges_all & v$counter <= n_edges_all){
       #Record last swipe result
       new_swipe_result = data.frame(pair_ID = appVals$current_card_content$arc_id, 
                                     source_var = appVals$current_card_content$Source_label,
@@ -221,6 +240,12 @@ server <- function(input, output, session){
       ## TO DO: swipes up and down may help SKIP some cards (edges); also allow extra skips using e.g. transitivity (if A influences B, and B influences C, there is no need to evaluate whether A influences C)
       current_card_ID <- appVals$current_card_content$arc_id + 1
       appVals$current_card_content <- cards_content[current_card_ID,]         # select
+      
+      ## Internal counter thread: https://stackoverflow.com/questions/33671915/r-shiny-server-how-to-keep-variable-value-in-observeevent-function
+      v$counter <- v$counter + 1
+      output$n_swipes <- renderPrint({
+        print(v$counter)
+      }) 
       
       ## send update to the ui.
       our_arc_ID <- as.character(appVals$current_card_content$arc_id)

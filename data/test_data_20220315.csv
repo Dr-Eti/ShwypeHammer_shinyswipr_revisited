@@ -1,0 +1,7 @@
+id,Source,Target,Source_label,Target_label,Source_URL,Target_URL
+1,node_001,node_002,climate change,healthier nutrition,https://pixabay.com/images/id-3836835/,https://pixabay.com/images/id-403595/
+2,node_001,node_003,climate change,proteins availability,https://pixabay.com/images/id-3836835/,https://pixabay.com/images/id-2887050/
+3,node_002,node_001,healthier nutrition,climate change,https://pixabay.com/images/id-403595/,https://pixabay.com/images/id-3836835/
+4,node_002,node_003,healthier nutrition,proteins availability,https://pixabay.com/images/id-403595/,https://pixabay.com/images/id-2887050/
+5,node_003,node_001,proteins availability,climate change,https://pixabay.com/images/id-2887050/,https://pixabay.com/images/id-3836835/
+6,node_003,node_002,proteins availability,healthier nutrition,https://pixabay.com/images/id-2887050/,https://pixabay.com/images/id-403595/
