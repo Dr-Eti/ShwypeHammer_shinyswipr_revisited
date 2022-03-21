@@ -137,10 +137,9 @@ server <- function(input, output, session){
   # for an update see see Ch. 19 in https://mastering-shiny.org/
   card_swipe <- callModule(Module_swipeCard_serverOLD, "my_tinderLike_swiper")
   
-  ## New: write swipes on google sheet
-  #url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"          # Xiang's
-  url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0"           # Ettore's
-  
+  ## Write swipes on google sheet
+  url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"          # Xiang's
+  #url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0"           # Ettore's
   
   ## TO DO: fix writing rights to access url for update google-sheet
   
