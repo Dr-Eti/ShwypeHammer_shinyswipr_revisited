@@ -27,21 +27,38 @@
 library(shiny)
 library("googlesheets4")
 
-# Handles access to Google Sheets for deployment 
-# Checks if token is available in ".secrets/" folder
-# If it exists, then directly access sheet without prompting Developer
-# Otherwise, prompt Developer for first login (needs to be done once by Developer when deploying)
-has_secret_token <- if (identical(list.files(".secrets/"), character(0))) FALSE else TRUE
+## Global parameters for saving results into local csv and google sheet
+## Set to FALSE to disable any of them
+SAVE_LOCAL_CSV <- TRUE
+SAVE_GOOGLESHEET <- TRUE
+url_sheet = "https://docs.google.com/spreadsheets/d/1n7NQtTZmQUFKOFH5XeU_QalZmk6Nh8fUAPk91I3IRUU/edit#gid=0" # Xiang's
+#url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0" # Ettore's
 
-if (has_secret_token == TRUE){
-  print("SECRET TOKEN FOUND...LOGIN WITHOUT PROMPT")
-  options(
-    gargle_oauth_cache = ".secrets",
-    gargle_oauth_email = TRUE
-  )
-} else if (has_secret_token == FALSE){
-  print("SECRET TOKEN NOT FOUND...PROMPTING FOR LOGIN")
-  gs4_auth(cache = ".secrets", email = "bxy20@cam.ac.uk")
+## Set local csv results to be saved into
+
+if (SAVE_LOCAL_CSV==TRUE){
+   local_results_csv = paste("results_",format(Sys.time(), "%Y%m%d%H%M"),".csv",sep="")
+}
+## Handles access to Google Sheets for deployment 
+## Checks if token is available in ".secrets/" folder
+## If it exists, then directly access sheet without prompting Developer
+## Otherwise, prompt Developer for first login (needs to be done once by Developer when deploying)
+
+
+if (SAVE_GOOGLESHEET==TRUE){
+  has_secret_token <- if (identical(list.files(".secrets/"), character(0))) FALSE else TRUE
+  
+  if (has_secret_token == TRUE){
+    print("SECRET TOKEN FOUND...LOGIN WITHOUT PROMPT")
+    options(
+      gargle_oauth_cache = ".secrets",
+      gargle_oauth_email = TRUE
+    )
+  } else if (has_secret_token == FALSE){
+    print("SECRET TOKEN NOT FOUND...PROMPTING FOR LOGIN")
+    gs4_auth(cache = ".secrets", email = "bxy20@cam.ac.uk")
+  }
+  
 }
 
 #### Part 1: Module UI for swipe card deck ####
@@ -157,13 +174,6 @@ server <- function(input, output, session){
   # for an update see see Ch. 19 in https://mastering-shiny.org/
   card_swipe <- callModule(Module_swipeCard_serverOLD, "my_tinderLike_swiper")
   
-  ## Write swipes on google sheet
-  url_sheet = "https://docs.google.com/spreadsheets/d/1n7NQtTZmQUFKOFH5XeU_QalZmk6Nh8fUAPk91I3IRUU/edit#gid=0"          # Xiang's
-  #url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0"           # Ettore's
-  
-  
-  ## TO DO: fix writing rights to access url for update google-sheet
-  
   
   ## New: Read node list and genereate edge list (all possible edges between nodes except self loops)
   nodes <- read.csv("data/test_data_20220321.csv")
@@ -248,7 +258,19 @@ server <- function(input, output, session){
       )
       
       ## save data into Google sheet
-      sheet_append(url_sheet, data = new_swipe_result, sheet = 1)
+      if (SAVE_GOOGLESHEET==TRUE){
+          sheet_append(url_sheet, data = new_swipe_result, sheet = 1)
+      }
+      
+      ## save data into local csv
+      if (SAVE_LOCAL_CSV==TRUE){
+        write.table(new_swipe_result,  
+                    file=local_results_csv, 
+                    append = T, 
+                    sep=',', 
+                    row.names=F, 
+                    col.names=F)
+      }
       
       ## send results to the output.
       output$resultsTable <- renderTable({appVals$swipes})
