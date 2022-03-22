@@ -129,9 +129,9 @@ ui <- fluidPage(
     tabPanel("Swipes log",
              tableOutput("resultsTable")
     ),
-    tabPanel("TEST coutner",                                         # DEBUG ONLY: remove
-             tableOutput("n_swipes")
-    ),
+    tabPanel("skip list",
+             textOutput("check_ID")
+    )
   )
 )
 
@@ -141,8 +141,8 @@ server <- function(input, output, session){
   card_swipe <- callModule(Module_swipeCard_serverOLD, "my_tinderLike_swiper")
   
   ## Write swipes on google sheet
-  url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"          # Xiang's
-  #url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0"           # Ettore's
+  #url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"          # Xiang's
+  url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0"           # Ettore's
   
   
   ## TO DO: fix writing rights to access url for update google-sheet
@@ -174,11 +174,12 @@ server <- function(input, output, session){
   colnames(cards_content) <- c("arc_id",colnames(edges))
   
   
+  ## empty list of cards to skip
+  skip_card_list <- reactiveValues()
+  list_idx <- reactiveValues(counter = 0L)
   
   ## For debug: read just few entries
   # cards_content <- cards_content[1:4,]
-  
-  
   
   ## count the total n. of edges  
   n_edges_all <- nrow(cards_content)
@@ -212,11 +213,12 @@ server <- function(input, output, session){
     swipes = data.frame(pair_ID = character(),
                         source_var = character(),
                         target_var = character(),
-                        swipe = character()
+                        swipe = character(),
+                        score = numeric()
     )
   )
   
-  ## TO DO: find a way to terminate the event listener below and change/shut down the UI when all edges (pairs) have been rated
+  ## TO DO: find a way to change the UI when all edges (pairs) have been rated
   
   observeEvent( card_swipe(), {
     if (current_card_ID <= n_edges_all & v$counter <= n_edges_all){
@@ -225,6 +227,38 @@ server <- function(input, output, session){
                                     source_var = appVals$current_card_content$Source_label,
                                     target_var = appVals$current_card_content$Target_label,
                                     swipe = card_swipe())
+      ## For swipe log only add binary value
+      if ((new_swipe_result$swipe == "right")  | (new_swipe_result$swipe == "up")){
+        new_swipe_result$score = 1
+      } else {
+        if ((new_swipe_result$swipe == "left")  | (new_swipe_result$swipe == "down")){
+          new_swipe_result$score = 0
+        }
+      }
+      ## special cases swipe up and swipe down: two records
+      if ((new_swipe_result$swipe == "up") | (new_swipe_result$swipe == "down")){
+        new_swipe_result2 <- new_swipe_result
+        new_swipe_result2$source_var <- new_swipe_result$target_var
+        new_swipe_result2$target_var <- new_swipe_result$source_var
+        
+        ## fetch card id
+        double_card_idx <- which(cards_content[,"Source_label"] == new_swipe_result2$source_var & cards_content[,"Target_label"] == new_swipe_result2$target_var )
+        new_swipe_result2$pair_ID <- cards_content[double_card_idx,"arc_id"]
+        
+        ## Update list of cards to skip (equivalent to removing card from deck)
+        ## TO DO:  allow extra skips using e.g. transitivity (if A influences B, and B influences C, there is no need to evaluate whether A influences C)
+        list_idx$counter <- list_idx$counter + 1 
+        skip_card_list$dList <- c(isolate(skip_card_list$dList), double_card_idx)       # thread: https://stackoverflow.com/questions/23874674/add-to-a-list-in-shiny
+        #skip_card_list[[list_idx$counter]] <- double_card_idx
+        output$check_ID <- renderPrint({
+          print(isolate(skip_card_list$dList))
+          #print(list_idx$counter)
+        }) 
+        
+        
+        ## generate two logs with one swipe
+        new_swipe_result <- rbind(new_swipe_result2, new_swipe_result)
+      }
       appVals$swipes <- rbind(
         new_swipe_result, 
         appVals$swipes
@@ -237,12 +271,18 @@ server <- function(input, output, session){
       output$resultsTable <- renderTable({appVals$swipes})
       
       ## update the pair on the card (determine next edge)
-      ## TO DO: swipes up and down may help SKIP some cards (edges); also allow extra skips using e.g. transitivity (if A influences B, and B influences C, there is no need to evaluate whether A influences C)
       current_card_ID <- appVals$current_card_content$arc_id + 1
+      v$counter <- v$counter + 1
+      
+      ## check card is not on skip list: PLEASE TEST THIS LOOP I HOPE IT DOESN'T MESS UP
+      aux_count <- 1
+      while((current_card_ID %in% isolate(skip_card_list$dList)) & aux_count <= n_edges_all ){
+        current_card_ID <- current_card_ID + 1
+        v$counter <- v$counter + 1
+      }
       appVals$current_card_content <- cards_content[current_card_ID,]         # select
       
       ## Internal counter thread: https://stackoverflow.com/questions/33671915/r-shiny-server-how-to-keep-variable-value-in-observeevent-function
-      v$counter <- v$counter + 1
       output$n_swipes <- renderPrint({
         print(v$counter)
       }) 
