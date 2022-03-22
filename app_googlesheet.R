@@ -286,20 +286,40 @@ server <- function(input, output, session){
         print(v$counter)
       }) 
       
-      ## send update to the ui.
-      our_arc_ID <- as.character(appVals$current_card_content$arc_id)
-      our_quote_1 <- as.character(appVals$current_card_content$Source_label)
-      our_quote_2 <- as.character(appVals$current_card_content$Target_label)
-      our_img_1 <- as.character(paste0("<img src='", appVals$current_card_content$Source_URL, "'>"))
-      our_img_2 <- as.character(paste0("<img src='", appVals$current_card_content$Target_URL, "'>"))
-      
-      ## Render the "pair"'s features 
-      output$arc_ID <- renderText({our_arc_ID}) 
-      output$quote_1 <- renderText({ strtrim(our_quote_1, 150) })
-      output$quote_2 <- renderText({ strtrim(our_quote_2, 150) })
-      output$url_1 <- renderText({our_img_1})
-      output$url_2 <- renderText({our_img_2})
-    } 
+      ## Handle card swipe updates
+      ## Updates to the next card
+      if (v$counter <= n_edges_all){
+        ## send update to the ui.
+        our_arc_ID <- as.character(appVals$current_card_content$arc_id)
+        our_quote_1 <- as.character(appVals$current_card_content$Source_label)
+        our_quote_2 <- as.character(appVals$current_card_content$Target_label)
+        our_img_1 <- as.character(paste0("<img src='", appVals$current_card_content$Source_URL, "'>"))
+        our_img_2 <- as.character(paste0("<img src='", appVals$current_card_content$Target_URL, "'>"))
+        
+        ## Render the "pair"'s features 
+        output$arc_ID <- renderText({our_arc_ID}) 
+        output$quote_1 <- renderText({ strtrim(our_quote_1, 150) })
+        output$quote_2 <- renderText({ strtrim(our_quote_2, 150) })
+        output$url_1 <- renderText({our_img_1})
+        output$url_2 <- renderText({our_img_2})
+
+      ## Handling the final swipe
+      }else{
+        print("FINISH SWIPING ALL...")
+        ## Renders the card empty
+        output$arc_ID <- renderText("")
+        output$quote_1 <- renderText("")
+        output$quote_2 <- renderText("")
+        output$url_1 <- renderText("")
+        output$url_2 <-renderText("")
+        
+        ## subject to change
+        ## remove whole card 
+        removeUI(
+          selector = "#my_tinderLike_swiper"
+        )
+      }
+    }
   }) #close event observe.
 }
 
