@@ -25,35 +25,58 @@
 
 #### Part 0: Load packages ####
 library(shiny)
-library(fortunes) 
 library("googlesheets4")
 
 #### Part 1: Module UI for swipe card deck ####
-Module_swipeCard_UI <- function(id, pass_img, pass_h3, pass_p){
+Module_swipeCard_UI <- function(id, pass_img1, pass_img2, pass_h3, pass_p1, pass_p2){
   ns <- NS(id)
-  tagList(                                      # a special type of layout function that allows you to bundle together multiple components without actually implying how they’ll be laid. Ch.19 https://mastering-shiny.org/scaling-modules.html
+  tagList(                                      # a special type of layout function that allows you to bundle together multiple components without actually implying how they will be laid. Ch.19 https://mastering-shiny.org/scaling-modules.html
     tags$head(                                  # load our www/myjavascrip.js and www/mycss.css files, which are saved under a www subfolder.
       tags$script(src = "hammer-min.js"),       # Call a third-party script that deals with mouse and touch events
       tags$script(src = "test-V5.js"),          # My customised script that governs the swipe detection and card animation on swipe
-      tags$link(rel = "stylesheet", type = "text/css", href = "test-V5.css")  # My customised card style
+      ## TO DO: css with buttons to replace swipes if necessary (Ettore has a work in progress)
+      tags$link(rel = "stylesheet", type = "text/css", href = "test-V5-2images.css")  # My customised card style (without buttons)
     ),
     tags$body(
       # create dependency: deck, card, card elements
       tags$div(id = id, class = "card-deck",
                tags$div(class = "card",
-                        #tags$img( ...image file here, stored in subdirectory www ... , height = 300, width =  400),
-                        #tags$html(pass_img, height = 100, width =  200),            # for images linked from web
-                        tags$div(class = "randomImage", pass_img),
-                        tags$h3(pass_h3),
-                        # The variable text contents generated through Shiny are better placed in a div, not a paragraph
-                        tags$div(class = "randomText", pass_p)
+                        ## Variable card contents: text and images
+                        tags$div(class = "row",
+                                 tags$h3("pair no.:"),
+                                 tags$h3(pass_h3),                               
+                        ),
+                        ## The variable text and images are better placed in divs
+                        ## place images from URL next to each other - see also CSS
+                        tags$div(class = "row",
+                                 tags$div(class = "randomImage", pass_img1),
+                                 tags$div(class = "randomImage", pass_img2),
+                                 
+                        ),
+                        ## place labels (image descriptions) next to each other
+                        tags$div(class = "textwrapper",
+                                 tags$div(class = "randomText1", pass_p1),
+                                 tags$div(class = "randomText2", pass_p2),
+                        ),
+                        ## fixed card content: describe directions of swipe to the user
+                        tags$div(class="row",
+                                 tags$h3(),
+                                 p(icon("arrow-up")),
+                                 p("mutual influence"),
+                                 p(icon("arrow-left"),
+                                   HTML("does NOT influence &#160 &#160 &#9679 &#160 &#160 &#160 &#160 &#160 INFLUENCES"),
+                                   icon("arrow-right"),
+                                 ),
+                                 p("no influence either way"),
+                                 p(icon("arrow-down")),
+                        ),
                )
       )
     )
   ) #end tag list.
 }
 
-#### Part 2: Module server for swipe cart deck  ####
+#### Part 2: Module server for swipe card deck  ####
 
 # There is a more up-to-date approach to modules in Shiny (see Ch. 19 in https://mastering-shiny.org/) but I stick to the original
 Module_swipeCard_serverOLD <- function(input, output, session){
@@ -69,7 +92,7 @@ Module_swipeCard_serverOLD <- function(input, output, session){
   # step 2: JS to Shiny
   # In Javascript we caused the module server's input "cardSwiped" to be set to whatever direction a card has been swiped
   # Notice that: 
-  # -- the (module) server’s input$cardSwiped CARRIES the final swipe decision (e.g. left, right...)
+  # -- the (module) server input$cardSwiped CARRIES the final swipe decision (e.g. left, right...)
   # -- Yet Java Script will return a combination of swipe direction and a "nonce" (in my revised JavaScript code: a random number).
   # -- Without a nonce, "observe" won't perceive any change in the environment - see https://shiny.rstudio.com/articles/js-send-message.html
   # In the below, the original shinysipr code uses the input value returned by the card swipe JavaScript as part of a reactive expression.
@@ -94,15 +117,21 @@ ui <- fluidPage(
     tabPanel("Deck",
              Module_swipeCard_UI("my_tinderLike_swiper",
                                  # These are the FIXED contents passed on to the card div
-                                 htmlOutput("url"),                                                            # This trick helps accommodate randomly generated images retrieved from the web
-                                 "here is a (trimmed) random quote",
-                                 textOutput("quote")                                                           # the random text will be accommodated in a separate div
+                                 htmlOutput("url_1"),                                                            # This trick helps accommodate randomly generated images retrieved from the web
+                                 htmlOutput("url_2"),
+                                 # show the progressive edge number as card ID,
+                                 textOutput("arc_ID"),
+                                 textOutput("quote_1"),                                                           # the random text will be accommodated in a separate div
+                                 textOutput("quote_2")
                                  
-             )
+             ),
     ),
     tabPanel("Swipes log",
              tableOutput("resultsTable")
-    )
+    ),
+    tabPanel("TEST coutner",                                         # DEBUG ONLY: remove
+             tableOutput("n_swipes")
+    ),
   )
 )
 
@@ -111,45 +140,127 @@ server <- function(input, output, session){
   # for an update see see Ch. 19 in https://mastering-shiny.org/
   card_swipe <- callModule(Module_swipeCard_serverOLD, "my_tinderLike_swiper")
   
-  # url for update google-sheet
-  url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"
+  ## Write swipes on google sheet
+  url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"          # Xiang's
+  #url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0"           # Ettore's
   
-  # The below follows pretty much the original quote sweeper example
-  # except I don't track the author of a quote, and introduce random images
+  
+  ## TO DO: fix writing rights to access url for update google-sheet
+  
+  
+  ## New: Read node list and genereate edge list (all possible edges between nodes except self loops)
+  nodes <- read.csv("data/test_data_20220321.csv")
+  ## Option 1 - Xiang's suggestion - really cool but works better for generating the edge list of an undirected graphs 
+  # edges <- as.data.frame(t(combn(nodes$node_ID,2)))                                       
+  # colnames(edges) <- c("source", "target")
+  ## Option 2 expand.grid
+  edges1 <- expand.grid(nodes$node_ID, nodes$node_ID)        # work out all the possible edges
+  edges1 <- edges1[,c(2,1)]                                  # swap column order
+  edges2 <- apply(edges1,1,function(x){
+    ## remove self loops
+    if(x[1] != x[2]){
+      ## retrieve card contents (description, image url) from the nodes involved in each edge (Card)
+      lookup_vector <- nodes[,"node_ID"]
+      idx_source <- match(x[1], lookup_vector)
+      idx_target <- match(x[2], lookup_vector)
+      c(x,nodes[idx_source ,"node_label"],nodes[idx_target ,"node_label"],nodes[idx_source ,"node_url"],nodes[idx_target ,"node_url"])
+    }
+  })           
+  edges3 <- edges2[!unlist(lapply(edges2, is.null))]          # pick non-null values from list. Thread: https://stackoverflow.com/questions/4227223/convert-a-list-to-a-data-frame
+  edges <- do.call(rbind.data.frame, edges3)                  # list to dataframe. Thread: https://stackoverflow.com/questions/4227223/convert-a-list-to-a-data-frame
+  colnames(edges) <- c("Source", "Target","Source_label","Target_label","Source_URL","Target_URL")
+  ## Add arc ID column
+  cards_content <- cbind(1:nrow(edges),edges)
+  colnames(cards_content) <- c("arc_id",colnames(edges))
+  
+  
+  
+  ## For debug: read just few entries
+  # cards_content <- cards_content[1:4,]
+  
+  
+  
+  ## count the total n. of edges  
+  n_edges_all <- nrow(cards_content)
+  cards_ID_list <- as.vector(cards_content[,1])
+  ## initiate sequential edge counter (card pair) 
+  current_card_ID <- 1
+  
+  ## Internal counter (reactive): thread https://stackoverflow.com/questions/33671915/r-shiny-server-how-to-keep-variable-value-in-observeevent-function
+  v <- reactiveValues(counter = 1L)
+  output$n_swipes <- renderPrint({
+    print(v$counter)
+  }) 
+  
+  current_card_content <- cards_content[current_card_ID,]         # select current card contents
+  our_arc_ID <- as.character(current_card_content$arc_id)
+  our_quote_1 <- as.character(current_card_content$Source_label)
+  our_quote_2 <- as.character(current_card_content$Target_label)
+  our_img_1 <- as.character(paste0("<img src='", current_card_content$Source_URL, "'>"))
+  our_img_2 <- as.character(paste0("<img src='", current_card_content$Target_URL, "'>"))
+  
+  # Render each "pair"'s features 
+  output$arc_ID <- renderText({our_arc_ID}) 
+  output$quote_1 <- renderText({ strtrim(our_quote_1, 150) })
+  output$quote_2 <- renderText({ strtrim(our_quote_2, 150) })
+  output$url_1 <- renderText({our_img_1})
+  output$url_2 <- renderText({our_img_2})
+  output$resultsTable <- renderDataTable({appVals$swipes})
+  
   appVals <- reactiveValues(
-    quote = fortune(),
-    random_image = paste0("<img src='","https://picsum.photos/320/320/?random=", round(runif(1)*1000000), "'>"),
-    swipes = data.frame(quote = character(),
+    current_card_content = current_card_content,
+    swipes = data.frame(pair_ID = character(),
+                        source_var = character(),
+                        target_var = character(),
                         swipe = character()
     )
   )
   
-  our_quote <- isolate(appVals$quote)
-  output$quote <- renderText({ strtrim(our_quote$quote, 150) })
-  output$url <- renderText({appVals$random_image})
-  output$resultsTable <- renderDataTable({appVals$swipes})
+  ## TO DO: find a way to terminate the event listener below and change/shut down the UI when all edges (pairs) have been rated
   
-  observeEvent( card_swipe(),{
-    #Record last swipe results.
-    new_swipe_result = data.frame(quote = appVals$quote$quote, swipe = card_swipe())
-    appVals$swipes <- rbind(
-      new_swipe_result, appVals$swipes
-    )
-    
-    #save data into Google sheet
-    sheet_append(url_sheet, data = new_swipe_result, sheet = 1)
-    
-    #send results to the output.
-    output$resultsTable <- renderTable({appVals$swipes})
-    
-    #update the quote and the image
-    appVals$quote <-fortune()
-    appVals$random_image <- paste0("<img src='", "https://picsum.photos/320/320/?random=", round(runif(1)*1000000), "'>")
-    
-    #send update to the ui.
-    output$quote <- renderText({ strtrim(appVals$quote$quote, 150) })
-    output$url <- renderText({appVals$random_image})
-    
+  observeEvent( card_swipe(), {
+    if (current_card_ID <= n_edges_all & v$counter <= n_edges_all){
+      #Record last swipe result
+      new_swipe_result = data.frame(pair_ID = appVals$current_card_content$arc_id, 
+                                    source_var = appVals$current_card_content$Source_label,
+                                    target_var = appVals$current_card_content$Target_label,
+                                    swipe = card_swipe())
+      appVals$swipes <- rbind(
+        new_swipe_result, 
+        appVals$swipes
+      )
+      
+      ## save data into Google sheet
+      sheet_append(url_sheet, data = new_swipe_result, sheet = 1)
+      
+      ## send results to the output.
+      output$resultsTable <- renderTable({appVals$swipes})
+      
+      ## update the pair on the card (determine next edge)
+      ## TO DO: swipes up and down may help SKIP some cards (edges); also allow extra skips using e.g. transitivity (if A influences B, and B influences C, there is no need to evaluate whether A influences C)
+      current_card_ID <- appVals$current_card_content$arc_id + 1
+      appVals$current_card_content <- cards_content[current_card_ID,]         # select
+      
+      ## Internal counter thread: https://stackoverflow.com/questions/33671915/r-shiny-server-how-to-keep-variable-value-in-observeevent-function
+      v$counter <- v$counter + 1
+      output$n_swipes <- renderPrint({
+        print(v$counter)
+      }) 
+      
+      ## send update to the ui.
+      our_arc_ID <- as.character(appVals$current_card_content$arc_id)
+      our_quote_1 <- as.character(appVals$current_card_content$Source_label)
+      our_quote_2 <- as.character(appVals$current_card_content$Target_label)
+      our_img_1 <- as.character(paste0("<img src='", appVals$current_card_content$Source_URL, "'>"))
+      our_img_2 <- as.character(paste0("<img src='", appVals$current_card_content$Target_URL, "'>"))
+      
+      ## Render the "pair"'s features 
+      output$arc_ID <- renderText({our_arc_ID}) 
+      output$quote_1 <- renderText({ strtrim(our_quote_1, 150) })
+      output$quote_2 <- renderText({ strtrim(our_quote_2, 150) })
+      output$url_1 <- renderText({our_img_1})
+      output$url_2 <- renderText({our_img_2})
+    } 
   }) #close event observe.
 }
 
