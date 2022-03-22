@@ -27,6 +27,23 @@
 library(shiny)
 library("googlesheets4")
 
+# Handles access to Google Sheets for deployment 
+# Checks if token is available in ".secrets/" folder
+# If it exists, then directly access sheet without prompting Developer
+# Otherwise, prompt Developer for first login (needs to be done once by Developer when deploying)
+has_secret_token <- if (identical(list.files(".secrets/"), character(0))) FALSE else TRUE
+
+if (has_secret_token == TRUE){
+  print("SECRET TOKEN FOUND...LOGIN WITHOUT PROMPT")
+  options(
+    gargle_oauth_cache = ".secrets",
+    gargle_oauth_email = TRUE
+  )
+} else if (has_secret_token == FALSE){
+  print("SECRET TOKEN NOT FOUND...PROMPTING FOR LOGIN")
+  gs4_auth(cache = ".secrets", email = "bxy20@cam.ac.uk")
+}
+
 #### Part 1: Module UI for swipe card deck ####
 Module_swipeCard_UI <- function(id, pass_img1, pass_img2, pass_h3, pass_p1, pass_p2){
   ns <- NS(id)
@@ -141,7 +158,7 @@ server <- function(input, output, session){
   card_swipe <- callModule(Module_swipeCard_serverOLD, "my_tinderLike_swiper")
   
   ## Write swipes on google sheet
-  url_sheet = "https://docs.google.com/spreadsheets/d/1FS5BTrwxJsrKjgBw6uBmN9O6a0d6HFJdTypMmy-8RM0/edit#gid=0"          # Xiang's
+  url_sheet = "https://docs.google.com/spreadsheets/d/1n7NQtTZmQUFKOFH5XeU_QalZmk6Nh8fUAPk91I3IRUU/edit#gid=0"          # Xiang's
   #url_sheet ="https://docs.google.com/spreadsheets/d/1bDBD1h8UhP-71maeklR4bMoRwLW_zASp8CnW8DxZqqI/edit#gid=0"           # Ettore's
   
   
