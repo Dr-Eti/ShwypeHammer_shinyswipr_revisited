@@ -1,0 +1,37 @@
+1,"Policies","Demand","right",1
+23,"Market","Policies","up",1
+2,"Policies","Market","up",1
+34,"Farmers","Policies","down",0
+3,"Policies","Farmers","down",0
+1,"Policies","Demand","right",1
+2,"Policies","Market","right",1
+34,"Farmers","Policies","up",1
+3,"Policies","Farmers","up",1
+4,"Policies","R&D","right",1
+5,"Policies","Diversification","left",0
+6,"Policies","Legume proteins","right",1
+7,"Policies","Animal proteins","left",0
+8,"Policies","Water availability","right",1
+9,"Policies","GHG emissions","left",0
+10,"Policies","Soil","right",1
+122,"Health concerns","Policies","up",1
+11,"Policies","Health concerns","up",1
+12,"Demand","Policies","right",1
+13,"Demand","Market","left",0
+14,"Demand","Farmers","right",1
+15,"Demand","R&D","left",0
+16,"Demand","Diversification","right",1
+17,"Demand","Legume proteins","left",0
+18,"Demand","Animal proteins","right",1
+19,"Demand","Water availability","right",1
+20,"Demand","GHG emissions","right",1
+21,"Demand","Soil","left",0
+22,"Demand","Health concerns","left",0
+23,"Market","Policies","left",0
+24,"Market","Demand","left",0
+25,"Market","Farmers","right",1
+26,"Market","R&D","right",1
+27,"Market","Diversification","right",1
+28,"Market","Legume proteins","left",0
+29,"Market","Animal proteins","left",0
+30,"Market","Water availability","left",0
