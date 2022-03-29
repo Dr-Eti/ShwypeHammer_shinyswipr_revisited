@@ -1,0 +1,132 @@
+/* Swiping in Shiny: testbench for modifying shinySwiper.js so that is uses Hammer.js */
+/* Notice that shinySwiper.js uses a "Class constructor" method. Therefore, I have re-done my swipe widget experiment following this tutorial
+      1: https://medium.com/@simonepm/build-a-full-featured-tinder-like-carousel-in-vanilla-javascript-part-i-44ca3a906450
+      2: https://github.com/nstrayer/shinyswipr
+
+/* in Firefox make sure you enable more tools -> web developer tools in the webpage used by LiveServer to visualise the results */
+/* then pick responsive mode to view as on a mobile device */
+
+
+body {
+  /* size: take full screen */
+  height: 96%;
+  width: 76%;
+  /* hide scroll bars */
+  overflow: hidden;
+  background-color: whitesmoke;
+}
+h1{
+  text-align: center;
+  font-size: 12px;
+  color: red;
+} 
+
+.card-deck {
+  width: 300px;
+  height: 550px;    
+  background-color: bisque;
+  /* we need # to apply a relative position or it won't work. On positioning: https://www.w3schools.com/css/css_positioning.asp */
+  position: absolute; 
+  /* hide scroll bars */
+  overflow: hidden;
+  /* palce the cards in the centre with some top and bottom spacing (padding) */
+  display: flex;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  margin-left: 120px;
+  justify-content: center;
+  /* THE Z INDEX  GOVERNS IF SOMEHTING IS TO THE FRONT OR TO THE BACK ON AN HTML DOC*/
+  z-index: 1;
+}
+/* setup the appearance of an individual card */
+.card {  
+  width: 280px;
+  height: 450px;
+  background-color: whitesmoke;
+  /* tutorial suggests aboslute position but uses html, not css; in that case positioning of card relative to its nearest ancestor would require using "absolute" https://www.w3schools.com/css/css_positioning.asp */
+  position: relative;  
+  /* display the cards next to each other horizozntally. If disabled, the cards will show up stacked vertically on top of each other */
+  /* notice that the size of the card-deck container adapts accordingly */
+  display: inline-block; 
+  /* ??? */
+  will-change: transform;
+  /* card outer corners and shadow */
+  border-radius: 5%;
+  box-shadow: 0px 5px 5px 0px rgba(0,0,0,0.1); 
+  /* disable selection when hovering on card*/
+  user-select: none;
+  /* cursor icon when hovering on the card */
+  cursor: grab;
+}
+
+.card h3 {
+  margin-top: 12px;
+  font-size: 16px;
+  padding: 0;
+  pointer-events: none;
+  text-align: center;
+  color: blueviolet;
+}
+
+
+/*  variable image  contents is placed in a div and pointer events disabled*/
+.card img {   
+  padding-top: 15px;  
+  padding-left: 25px;
+  max-width: 140px;
+  /* fix image size */
+  height: 180px;
+  width: 140px; 
+  opacity: 0.7;
+  pointer-events: none;  
+  user-select: none;
+}
+
+.card .row{
+  pointer-events: none;  
+  user-select: none;
+}
+
+.card .randomImage{ 
+  /* side by side see https://www.w3schools.com/howto/howto_css_images_side_by_side.asp */ 
+  float: left; 
+  width: 140px;  
+}
+
+/* Clear floats after image containers */
+.row::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+/* The variable text  contents generated through Shiny are better placed in a div, not a paragraph */
+/* placing text next to each other thread: https://morioh.com/p/84b3ea38043c */
+.card .textwrapper {
+  width: 280px;     
+  pointer-events: none;  
+  user-select: none;
+  text-align: center;
+  font-size: 14px;
+  color: blue;  
+}
+
+.card .randomText1{
+  width: 140px; 
+  float: left;  
+  padding-top: 15px;     
+}
+
+.card .randomText2{
+  padding-top: 15px;  
+}
+
+.card p {  
+  /* padding-top: 1px; */
+  text-align: center;
+  font-size: 10px;
+  color: green;
+  text-align: center;
+  pointer-events: none;  
+  user-select: none;
+}
